@@ -7,6 +7,7 @@ dotenv.config();
 import logger from './config/logger';
 import { parseAudioSequenceCSV } from './parsers/csvParser';
 import { validateAudioFiles, validateOutputDirectory } from './validators/fileValidator';
+import path from 'path';
 import { combineAudioFiles } from './audio_processing/audioProcessor';
 
 /**
@@ -47,7 +48,22 @@ import { combineAudioFiles } from './audio_processing/audioProcessor';
     }
 
     logger.info(`CSV file: ${PATH_AND_FILENAME_AUDIO_CSV_FILE}`);
-    logger.info(`Output file: ${PATH_MP3_OUTPUT}`);
+    logger.info(`Output directory: ${PATH_MP3_OUTPUT}`);
+
+    // Generate timestamp-based filename: output_YYYYMMDD_HHMMSS.mp3
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+    const outputFileName = `output_${timestamp}.mp3`;
+    const outputFilePath = path.join(PATH_MP3_OUTPUT, outputFileName);
+
+    logger.info(`Generated output filename: ${outputFileName}`);
+    logger.info(`Full output path: ${outputFilePath}`);
 
     // Step 1: Parse the CSV file
     let audioSequence;
@@ -81,7 +97,7 @@ import { combineAudioFiles } from './audio_processing/audioProcessor';
 
     // Step 4: Process audio files
     logger.info('All validations passed - starting audio processing');
-    const result = await combineAudioFiles(audioSequence, PATH_MP3_OUTPUT, PATH_PROJECT_RESOURCES);
+    const result = await combineAudioFiles(audioSequence, outputFilePath, PATH_PROJECT_RESOURCES);
 
     // Step 5: Report results
     logger.info('=== Processing Complete ===');
