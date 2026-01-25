@@ -19,7 +19,7 @@ import { combineAudioFiles } from "./modules/audioProcessor";
  */
 (async () => {
   try {
-    logger.info("=== Morning Meditation Mantra 01 - Starting ===");
+    logger.info("=== Audio File Concatenator 01 - Starting ===");
 
     // Validate additional required environment variables
     const PATH_AND_FILENAME_AUDIO_CSV_FILE =

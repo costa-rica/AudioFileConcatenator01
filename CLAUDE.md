@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Morning Meditation Mantra 01 is a TypeScript microservice that combines audio files (MP3) with configurable pauses to create meditation audio sequences. The service reads a CSV file that specifies the sequence of audio files and pause durations, then uses FFmpeg to generate a single combined MP3 file.
+Audio File Concatenator 01 is a TypeScript microservice that combines audio files (MP3) with configurable pauses to create meditation audio sequences. The service reads a CSV file that specifies the sequence of audio files and pause durations, then uses FFmpeg to generate a single combined MP3 file.
 
 **Future expansion**: This microservice will eventually be triggered by an ExpressJS API.
 
@@ -28,7 +28,7 @@ npm run clean
 
 The application requires these variables in `.env`:
 
-- **NAME_APP**: Application identifier (e.g., `MorningMeditationMantra01`)
+- **NAME_APP**: Application identifier (e.g., `AudioFileConcatenator01`)
 - **NODE_ENV**: Environment mode (`development`, `testing`, or `production`)
 - **PATH_PROJECT_RESOURCES**: Base path for project resources (used for temporary files)
 - **PATH_AND_FILENAME_AUDIO_CSV_FILE**: Full path to the CSV file containing the audio sequence
@@ -36,6 +36,7 @@ The application requires these variables in `.env`:
 - **PATH_TO_LOGS**: Directory for Winston log files
 
 Optional variables:
+
 - **LOG_MAX_SIZE**: Log file size in MB before rotation (default: 5)
 - **LOG_MAX_FILES**: Number of rotated log files to retain (default: 5)
 
@@ -53,6 +54,7 @@ The application follows a strict separation of concerns with each processing ste
 ### Entry Point Flow
 
 `src/main.ts` orchestrates the entire process using an async IIFE pattern:
+
 1. Loads environment variables
 2. Validates required env vars (exits early if missing)
 3. Generates timestamp-based output filename (`output_YYYYMMDD_HHMMSS.mp3`)
@@ -67,6 +69,7 @@ Early exits include 100ms delay before `process.exit()` to ensure Winston logs f
 ### Audio Processing Details
 
 The `combineAudioFiles` function:
+
 - Creates a `temporary_deletable` directory inside `PATH_PROJECT_RESOURCES` for temp files
 - Generates silent MP3 files for pause durations using FFmpeg's `anullsrc` filter
 - Creates a concat list file for FFmpeg to merge all audio files
@@ -77,6 +80,7 @@ The `combineAudioFiles` function:
 ### CSV Format
 
 The CSV file must have these columns:
+
 - **id**: Step identifier
 - **audio_file_name_and_path**: Full path to an MP3 file (mutually exclusive with pause_duration)
 - **pause_duration**: Duration in seconds for a silent pause (mutually exclusive with audio_file_name_and_path)
@@ -86,6 +90,7 @@ Each row represents one step in the sequence. Either `audio_file_name_and_path` 
 ### Logging Implementation
 
 Follows the `docs/LOGGING_NODE_JS_V06.md` specification:
+
 - **Development mode**: Console output only
 - **Testing mode**: Console AND file output
 - **Production mode**: File output only
@@ -96,6 +101,7 @@ Follows the `docs/LOGGING_NODE_JS_V06.md` specification:
 ### Type Definitions
 
 All shared types are in `src/types/index.ts`:
+
 - **AudioSequenceStep**: Represents a single step in the CSV (audio file or pause)
 - **ProcessingResult**: Contains the output path and final audio duration
 
@@ -106,6 +112,7 @@ The application uses `ffmpeg-static` to bundle a static FFmpeg binary, ensuring 
 ## Code Modification Guidelines
 
 When modifying this codebase:
+
 - Maintain the modular structure - each processing step should remain independent
 - Audio processing changes go in `src/modules/audioProcessor.ts`
 - CSV parsing changes go in `src/modules/csvParser.ts`

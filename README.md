@@ -1,8 +1,10 @@
-# Morning Meditation Mantra 01
+# Audio File Concatenator 01
 
 ## Overview
 
 A TypeScript microservice that combines multiple MP3 audio files with configurable pauses to create seamless meditation sequences. The service reads a CSV file specifying the audio sequence (files and pause durations), uses FFmpeg to generate silence and concatenate audio, and outputs a single timestamp-named MP3 file. Designed for eventual integration with an ExpressJS API.
+
+This app was build to support the Medition Mantra Creator Project.
 
 ## How to Build and Run
 
@@ -46,7 +48,7 @@ src/
 Create a `.env` file in the project root:
 
 ```env
-NAME_APP=MorningMeditationMantra01
+NAME_APP=AudioFileConcatenator01
 NODE_ENV=development  # development | testing | production
 PATH_PROJECT_RESOURCES=/path/to/resources
 PATH_AND_FILENAME_AUDIO_CSV_FILE=/path/to/audio_sequence.csv

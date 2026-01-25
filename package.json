@@ -1,5 +1,5 @@
 {
-  "name": "morning-meditation-mantra-01",
+  "name": "audio-file-concatenator-01",
   "version": "1.0.0",
   "description": "TypeScript microservice to combine audio files with parameterized pauses",
   "main": "dist/main.js",

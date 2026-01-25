@@ -1,4 +1,4 @@
-# Requirements: Morning Meditation Mantra 01
+# Requirements: Audio File Concatenator 01
 
 ## Objective
 
@@ -12,7 +12,7 @@ This micro service will peice together the audio files to create a single mp3 fi
 There will be a .env file in the root of the project. The .env file will contain the following variables:
 
 ```env
-NAME_APP=MorningMeditationMantra01
+NAME_APP=AudioFileConcatenator01
 NODE_ENV=development
 PATH_AND_FILENAME_AUDIO_CSV_FILE=/Users/nick/Documents/_project_resources/MorningMeditationMantra/audio_sequence.csv
 PATH_TO_LOGS=/Users/nick/Documents/_logs
