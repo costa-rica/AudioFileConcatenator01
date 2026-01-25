@@ -1,0 +1,32 @@
+{
+  "name": "morning-meditation-mantra-01",
+  "version": "1.0.0",
+  "description": "TypeScript microservice to combine audio files with parameterized pauses",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node src/main.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "audio",
+    "meditation",
+    "mp3"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.24",
+    "@types/node": "^20.11.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.1",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "winston": "^3.11.0"
+  }
+}
