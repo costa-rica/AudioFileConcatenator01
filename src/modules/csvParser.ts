@@ -1,10 +1,10 @@
-import fs from 'fs';
-import csv from 'csv-parser';
-import logger from '../config/logger';
-import { AudioSequenceStep } from '../types';
+import fs from "fs";
+import csv from "csv-parser";
+import logger from "./logger";
+import { AudioSequenceStep } from "../types";
 
 export async function parseAudioSequenceCSV(
-  csvPath: string
+  csvPath: string,
 ): Promise<AudioSequenceStep[]> {
   logger.info(`Parsing CSV file: ${csvPath}`);
 
@@ -20,13 +20,16 @@ export async function parseAudioSequenceCSV(
 
     fs.createReadStream(csvPath)
       .pipe(csv())
-      .on('data', (row: any) => {
+      .on("data", (row: any) => {
         const step: AudioSequenceStep = {
           id: row.id,
         };
 
         // Either audio_file_name_and_path or pause_duration should be populated
-        if (row.audio_file_name_and_path && row.audio_file_name_and_path.trim()) {
+        if (
+          row.audio_file_name_and_path &&
+          row.audio_file_name_and_path.trim()
+        ) {
           step.audio_file_name_and_path = row.audio_file_name_and_path.trim();
         }
 
@@ -35,7 +38,7 @@ export async function parseAudioSequenceCSV(
 
           if (isNaN(step.pause_duration)) {
             logger.warn(
-              `Invalid pause_duration for step ${row.id}: ${row.pause_duration}`
+              `Invalid pause_duration for step ${row.id}: ${row.pause_duration}`,
             );
             step.pause_duration = undefined;
           }
@@ -43,11 +46,11 @@ export async function parseAudioSequenceCSV(
 
         results.push(step);
       })
-      .on('error', (error) => {
+      .on("error", (error) => {
         logger.error(`Error parsing CSV file: ${error.message}`);
         reject(error);
       })
-      .on('end', () => {
+      .on("end", () => {
         logger.info(`Successfully parsed ${results.length} steps from CSV`);
         resolve(results);
       });

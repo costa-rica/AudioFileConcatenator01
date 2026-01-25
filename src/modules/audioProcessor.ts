@@ -1,9 +1,9 @@
-import ffmpeg from 'fluent-ffmpeg';
-import ffmpegStatic from 'ffmpeg-static';
-import fs from 'fs';
-import path from 'path';
-import logger from '../config/logger';
-import { AudioSequenceStep, ProcessingResult } from '../types';
+import ffmpeg from "fluent-ffmpeg";
+import ffmpegStatic from "ffmpeg-static";
+import fs from "fs";
+import path from "path";
+import logger from "../modules/logger";
+import { AudioSequenceStep, ProcessingResult } from "../types";
 
 // Set ffmpeg path to the static binary
 if (ffmpegStatic) {
@@ -15,23 +15,23 @@ if (ffmpegStatic) {
  */
 async function generateSilence(
   durationSeconds: number,
-  outputPath: string
+  outputPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     logger.info(`Generating ${durationSeconds}s silence: ${outputPath}`);
 
     ffmpeg()
-      .input('anullsrc=r=44100:cl=stereo')
-      .inputFormat('lavfi')
+      .input("anullsrc=r=44100:cl=stereo")
+      .inputFormat("lavfi")
       .duration(durationSeconds)
-      .audioCodec('libmp3lame')
-      .audioBitrate('128k')
+      .audioCodec("libmp3lame")
+      .audioBitrate("128k")
       .output(outputPath)
-      .on('end', () => {
+      .on("end", () => {
         logger.info(`Silence generated: ${outputPath}`);
         resolve();
       })
-      .on('error', (err) => {
+      .on("error", (err) => {
         logger.error(`Error generating silence: ${err.message}`);
         reject(err);
       })
@@ -63,12 +63,12 @@ async function getAudioDuration(filePath: string): Promise<number> {
 export async function combineAudioFiles(
   steps: AudioSequenceStep[],
   outputPath: string,
-  projectResourcesPath: string
+  projectResourcesPath: string,
 ): Promise<ProcessingResult> {
   logger.info(`Starting audio processing with ${steps.length} steps`);
 
   // Create temporary_deletable directory for temp files
-  const tempDir = path.join(projectResourcesPath, 'temporary_deletable');
+  const tempDir = path.join(projectResourcesPath, "temporary_deletable");
 
   // Create the directory if it doesn't exist
   if (!fs.existsSync(tempDir)) {
@@ -76,7 +76,7 @@ export async function combineAudioFiles(
     logger.info(`Created temporary directory: ${tempDir}`);
   }
 
-  const concatListPath = path.join(tempDir, 'concat-list.txt');
+  const concatListPath = path.join(tempDir, "concat-list.txt");
 
   try {
     // Prepare files for concatenation
@@ -87,7 +87,9 @@ export async function combineAudioFiles(
 
       if (step.audio_file_name_and_path) {
         // Add existing audio file
-        logger.info(`Step ${step.id}: Adding audio file ${step.audio_file_name_and_path}`);
+        logger.info(
+          `Step ${step.id}: Adding audio file ${step.audio_file_name_and_path}`,
+        );
         filesToConcat.push(step.audio_file_name_and_path);
       } else if (step.pause_duration !== undefined && step.pause_duration > 0) {
         // Generate silence for pause
@@ -98,13 +100,13 @@ export async function combineAudioFiles(
     }
 
     if (filesToConcat.length === 0) {
-      throw new Error('No audio files or pauses to process');
+      throw new Error("No audio files or pauses to process");
     }
 
     // Create concat list file for FFmpeg
     const concatListContent = filesToConcat
       .map((file) => `file '${file.replace(/'/g, "'\\''")}'`)
-      .join('\n');
+      .join("\n");
 
     fs.writeFileSync(concatListPath, concatListContent);
     logger.info(`Created concat list with ${filesToConcat.length} entries`);
@@ -115,14 +117,17 @@ export async function combineAudioFiles(
 
       ffmpeg()
         .input(concatListPath)
-        .inputOptions(['-f', 'concat', '-safe', '0'])
-        .audioCodec('copy')
+        .inputOptions(["-f", "concat", "-safe", "0"])
+        .audioCodec("libmp3lame")
+        .audioBitrate("128k")
+        .audioFrequency(44100)
+        .audioChannels(2)
         .output(outputPath)
-        .on('end', () => {
-          logger.info('Audio concatenation completed successfully');
+        .on("end", () => {
+          logger.info("Audio concatenation completed successfully");
           resolve();
         })
-        .on('error', (err) => {
+        .on("error", (err) => {
           logger.error(`Error concatenating audio: ${err.message}`);
           reject(err);
         })
@@ -131,7 +136,9 @@ export async function combineAudioFiles(
 
     // Get the duration of the final output
     const audioLengthSeconds = await getAudioDuration(outputPath);
-    logger.info(`Final audio duration: ${audioLengthSeconds.toFixed(2)} seconds`);
+    logger.info(
+      `Final audio duration: ${audioLengthSeconds.toFixed(2)} seconds`,
+    );
 
     const result: ProcessingResult = {
       outputPath,
@@ -141,7 +148,7 @@ export async function combineAudioFiles(
     return result;
   } finally {
     // Cleanup temporary_deletable directory and all its contents
-    logger.info('Cleaning up temporary directory');
+    logger.info("Cleaning up temporary directory");
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
       logger.info(`Deleted temporary directory: ${tempDir}`);

@@ -1,13 +1,13 @@
-import fs from 'fs';
-import logger from '../config/logger';
-import { AudioSequenceStep } from '../types';
+import fs from "fs";
+import logger from "./logger";
+import { AudioSequenceStep } from "../types";
 
 export function validateAudioFiles(steps: AudioSequenceStep[]): boolean {
-  logger.info('Validating audio files existence...');
+  logger.info("Validating audio files existence...");
 
   const missingFiles: string[] = [];
   const audioSteps = steps.filter(
-    (step) => step.audio_file_name_and_path !== undefined
+    (step) => step.audio_file_name_and_path !== undefined,
   );
 
   for (const step of audioSteps) {
@@ -21,7 +21,7 @@ export function validateAudioFiles(steps: AudioSequenceStep[]): boolean {
 
   if (missingFiles.length > 0) {
     logger.error(
-      `Validation failed: ${missingFiles.length} audio file(s) not found`
+      `Validation failed: ${missingFiles.length} audio file(s) not found`,
     );
     return false;
   }
