@@ -14,7 +14,7 @@ There will be a .env file in the root of the project. The .env file will contain
 ```env
 NAME_APP=MorningMeditationMantra01
 NODE_ENV=development
-PATH_AUDIO_CSV_FILE=/Users/nick/Documents/_project_resources/MorningMeditationMantra/audio_sequence.csv
+PATH_AND_FILENAME_AUDIO_CSV_FILE=/Users/nick/Documents/_project_resources/MorningMeditationMantra/audio_sequence.csv
 PATH_TO_LOGS=/Users/nick/Documents/_logs
 ```
 
