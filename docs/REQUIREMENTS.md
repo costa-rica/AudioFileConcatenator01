@@ -14,7 +14,7 @@ There will be a .env file in the root of the project. The .env file will contain
 ```env
 NAME_APP=AudioFileConcatenator01
 NODE_ENV=development
-PATH_AND_FILENAME_AUDIO_CSV_FILE=/Users/nick/Documents/_project_resources/MeditationMantraCreatorProject/audio_sequence.csv
+PATH_AND_FILENAME_AUDIO_CSV_FILE=/Users/nick/Documents/_project_resources/Mantrify/audio_sequence.csv
 PATH_TO_LOGS=/Users/nick/Documents/_logs
 ```
 

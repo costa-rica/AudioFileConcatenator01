@@ -4,7 +4,7 @@
 
 A TypeScript microservice that combines multiple MP3 audio files with configurable pauses to create seamless meditation sequences. The service reads a CSV file specifying the audio sequence (files and pause durations), uses FFmpeg to generate silence and concatenate audio, and outputs a single timestamp-named MP3 file. Designed for eventual integration with an ExpressJS API.
 
-This service was build to support the Meditation Mantra Creator Project.
+This service was build to support the Mantrify Project.
 
 ## How to Build and Run
 
