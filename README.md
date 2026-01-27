@@ -52,7 +52,7 @@ NAME_APP=AudioFileConcatenator01
 NODE_ENV=development  # development | testing | production
 PATH_PROJECT_RESOURCES=/path/to/resources
 PATH_AND_FILENAME_AUDIO_CSV_FILE=/path/to/audio_sequence.csv
-PATH_MP3_OUTPUT=/path/to/output
+PATH_MP3_OUTPUT=/path/to/output  # Base directory (date subdirectories created automatically)
 PATH_TO_LOGS=/path/to/logs
 
 # Optional
@@ -84,12 +84,15 @@ id,audio_file_name_and_path,pause_duration
 ## Processing Workflow
 
 1. Environment validation - Verify all required variables are set
-2. CSV parsing - Load and parse audio sequence file
-3. Output validation - Confirm output directory exists and is writable
-4. File validation - Verify all referenced audio files exist
-5. Audio processing:
+2. Output path preparation - Create date-based subdirectory (`YYYYMMDD`) in `PATH_MP3_OUTPUT` if it doesn't exist
+3. CSV parsing - Load and parse audio sequence file
+4. Output validation - Confirm output directory exists and is writable
+5. File validation - Verify all referenced audio files exist
+6. Audio processing:
    - Generate silent MP3 files for specified pause durations
    - Create FFmpeg concat list
    - Concatenate all audio (re-encoded to 44.1kHz, stereo, 128kbps for compatibility)
-6. Cleanup - Remove temporary files
-7. Output - Save to `output_YYYYMMDD_HHMMSS.mp3`
+7. Cleanup - Remove temporary files
+8. Output - Save to `PATH_MP3_OUTPUT/YYYYMMDD/output_YYYYMMDD_HHMMSS.mp3`
+
+**Output Organization**: Files are automatically organized into date-based subdirectories. For example, a file created on January 26, 2026 at 3:45:30 PM would be saved to `PATH_MP3_OUTPUT/20260126/output_20260126_154530.mp3`.

@@ -32,7 +32,7 @@ The application requires these variables in `.env`:
 - **NODE_ENV**: Environment mode (`development`, `testing`, or `production`)
 - **PATH_PROJECT_RESOURCES**: Base path for project resources (used for temporary files)
 - **PATH_AND_FILENAME_AUDIO_CSV_FILE**: Full path to the CSV file containing the audio sequence
-- **PATH_MP3_OUTPUT**: Directory where the final MP3 will be saved
+- **PATH_MP3_OUTPUT**: Base directory where the final MP3 will be saved (date subdirectories will be created automatically)
 - **PATH_TO_LOGS**: Directory for Winston log files
 
 Optional variables:
@@ -58,13 +58,23 @@ The application follows a strict separation of concerns with each processing ste
 1. Loads environment variables
 2. Validates required env vars (exits early if missing)
 3. Generates timestamp-based output filename (`output_YYYYMMDD_HHMMSS.mp3`)
-4. Parses CSV file
-5. Validates output directory
-6. Validates all audio files exist
-7. Processes audio (generates silences, concatenates)
-8. Reports results and exits
+4. Creates date-based subdirectory (`YYYYMMDD`) in `PATH_MP3_OUTPUT` if it doesn't exist
+5. Parses CSV file
+6. Validates output directory
+7. Validates all audio files exist
+8. Processes audio (generates silences, concatenates)
+9. Reports results and exits
 
 Early exits include 100ms delay before `process.exit()` to ensure Winston logs flush to disk.
+
+### Output File Organization
+
+The application organizes output files into date-based subdirectories:
+
+- Output files are saved to `PATH_MP3_OUTPUT/YYYYMMDD/output_YYYYMMDD_HHMMSS.mp3`
+- Date subdirectories (format: `YYYYMMDD`) are automatically created if they don't exist
+- This structure organizes files by day, making it easier to manage and locate audio files
+- Example: A file created on January 26, 2026 at 3:45:30 PM would be saved to `PATH_MP3_OUTPUT/20260126/output_20260126_154530.mp3`
 
 ### Audio Processing Details
 

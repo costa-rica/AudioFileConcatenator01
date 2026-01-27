@@ -11,6 +11,7 @@ import {
   validateOutputDirectory,
 } from "./modules/fileValidator";
 import path from "path";
+import fs from "fs";
 import { combineAudioFiles } from "./modules/audioProcessor";
 
 /**
@@ -65,9 +66,22 @@ import { combineAudioFiles } from "./modules/audioProcessor";
     const seconds = String(now.getSeconds()).padStart(2, "0");
     const timestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
     const outputFileName = `output_${timestamp}.mp3`;
-    const outputFilePath = path.join(PATH_MP3_OUTPUT, outputFileName);
+
+    // Create date-based subdirectory (YYYYMMDD)
+    const dateFolder = `${year}${month}${day}`;
+    const dateFolderPath = path.join(PATH_MP3_OUTPUT, dateFolder);
+
+    // Ensure the date subdirectory exists
+    if (!fs.existsSync(dateFolderPath)) {
+      fs.mkdirSync(dateFolderPath, { recursive: true });
+      logger.info(`Created date subdirectory: ${dateFolderPath}`);
+    }
+
+    // Save file to date subdirectory
+    const outputFilePath = path.join(dateFolderPath, outputFileName);
 
     logger.info(`Generated output filename: ${outputFileName}`);
+    logger.info(`Date subdirectory: ${dateFolder}`);
     logger.info(`Full output path: ${outputFilePath}`);
 
     // Step 1: Parse the CSV file
