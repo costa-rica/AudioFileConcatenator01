@@ -1,14 +1,12 @@
 import ffmpeg from "fluent-ffmpeg";
-import ffmpegStatic from "ffmpeg-static";
 import fs from "fs";
 import path from "path";
 import logger from "../modules/logger";
 import { AudioSequenceStep, ProcessingResult } from "../types";
 
-// Set ffmpeg path to the static binary
-if (ffmpegStatic) {
-  ffmpeg.setFfmpegPath(ffmpegStatic);
-}
+// Using system FFmpeg (must be installed via package manager)
+// Mac: brew install ffmpeg
+// Ubuntu: sudo apt-get install ffmpeg
 
 /**
  * Generate a silent audio file with the specified duration

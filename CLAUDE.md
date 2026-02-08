@@ -8,6 +8,28 @@ Audio File Concatenator 01 is a TypeScript microservice that combines audio file
 
 **Future expansion**: This microservice will eventually be triggered by an ExpressJS API.
 
+## System Requirements
+
+This application requires **FFmpeg** to be installed on the system:
+
+**Mac (Homebrew):**
+```bash
+brew install ffmpeg
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get update && sudo apt-get install -y ffmpeg
+```
+
+**Verify installation:**
+```bash
+ffmpeg -version
+ffmpeg -hide_banner -formats | grep -E ' D.*lavfi'  # Should show lavfi support
+```
+
+The application uses `fluent-ffmpeg` which automatically detects the system FFmpeg installation.
+
 ## Development Commands
 
 ```bash
@@ -117,7 +139,7 @@ All shared types are in `src/types/index.ts`:
 
 ## FFmpeg Configuration
 
-The application uses `ffmpeg-static` to bundle a static FFmpeg binary, ensuring consistent behavior across environments. The binary path is set in `src/modules/audioProcessor.ts` before any FFmpeg operations.
+The application uses the system-installed FFmpeg binary via `fluent-ffmpeg`. The library automatically detects the FFmpeg installation on your system (see System Requirements section for installation instructions). This approach ensures compatibility with all FFmpeg features including the `lavfi` (libavfilter) virtual input device required for generating silent audio.
 
 ## Code Modification Guidelines
 
