@@ -1,4 +1,5 @@
 import ffmpeg from "fluent-ffmpeg";
+import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import logger from "../modules/logger";
@@ -8,8 +9,48 @@ import { AudioSequenceStep, ProcessingResult } from "../types";
 // Mac: brew install ffmpeg
 // Ubuntu: sudo apt-get install ffmpeg
 
+// Explicitly set FFmpeg path to ensure fluent-ffmpeg uses the correct binary
+function findAndSetFfmpegPath(): void {
+  try {
+    // Try to find ffmpeg using 'which' command
+    const ffmpegPath = execSync("which ffmpeg", { encoding: "utf-8" }).trim();
+    if (ffmpegPath && fs.existsSync(ffmpegPath)) {
+      ffmpeg.setFfmpegPath(ffmpegPath);
+      logger.info(`Using FFmpeg at: ${ffmpegPath}`);
+      return;
+    }
+  } catch (err) {
+    // 'which' command failed, try common paths
+    logger.warn("Could not find ffmpeg using 'which', trying common paths");
+  }
+
+  // Common FFmpeg installation paths
+  const commonPaths = [
+    "/opt/homebrew/bin/ffmpeg", // Mac Apple Silicon (Homebrew)
+    "/usr/local/bin/ffmpeg", // Mac Intel (Homebrew)
+    "/usr/bin/ffmpeg", // Ubuntu/Linux
+  ];
+
+  for (const ffmpegPath of commonPaths) {
+    if (fs.existsSync(ffmpegPath)) {
+      ffmpeg.setFfmpegPath(ffmpegPath);
+      logger.info(`Using FFmpeg at: ${ffmpegPath}`);
+      return;
+    }
+  }
+
+  logger.error(
+    "Could not find FFmpeg installation. Please install FFmpeg and ensure it's in your PATH.",
+  );
+  throw new Error("FFmpeg not found");
+}
+
+// Initialize FFmpeg path
+findAndSetFfmpegPath();
+
 /**
  * Generate a silent audio file with the specified duration
+ * Using direct ffmpeg call to avoid fluent-ffmpeg lavfi detection issues
  */
 async function generateSilence(
   durationSeconds: number,
@@ -18,22 +59,30 @@ async function generateSilence(
   return new Promise((resolve, reject) => {
     logger.info(`Generating ${durationSeconds}s silence: ${outputPath}`);
 
-    ffmpeg()
-      .input("anullsrc=r=44100:cl=stereo")
-      .inputFormat("lavfi")
-      .duration(durationSeconds)
-      .audioCodec("libmp3lame")
-      .audioBitrate("128k")
-      .output(outputPath)
-      .on("end", () => {
+    try {
+      // Get ffmpeg path (should be already set, but get it again to be sure)
+      let ffmpegPath = "ffmpeg"; // fallback to PATH
+      try {
+        ffmpegPath = execSync("which ffmpeg", { encoding: "utf-8" }).trim();
+      } catch {
+        // Use default if which fails
+      }
+
+      // Call ffmpeg directly to generate silence
+      const cmd = `${ffmpegPath} -f lavfi -i anullsrc=r=44100:cl=stereo -t ${durationSeconds} -c:a libmp3lame -b:a 128k -y "${outputPath}"`;
+      execSync(cmd, { stdio: "pipe" });
+
+      if (fs.existsSync(outputPath)) {
         logger.info(`Silence generated: ${outputPath}`);
         resolve();
-      })
-      .on("error", (err) => {
-        logger.error(`Error generating silence: ${err.message}`);
-        reject(err);
-      })
-      .run();
+      } else {
+        throw new Error("Output file was not created");
+      }
+    } catch (err) {
+      const error = err as Error;
+      logger.error(`Error generating silence: ${error.message}`);
+      reject(error);
+    }
   });
 }
 
